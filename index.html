@@ -14,7 +14,6 @@ body {
     text-align: center;
 }
 
-/* Main container */
 .container {
     max-width: 900px;
     margin: 50px auto;
@@ -22,72 +21,76 @@ body {
     border-radius: 20px;
     background: rgba(255,255,255,0.1);
     backdrop-filter: blur(10px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    animation: fadeIn 1.5s ease;
 }
 
-/* Title */
-h1 {
-    font-size: 40px;
-    letter-spacing: 2px;
-}
-
-/* Paragraph styling */
-p {
-    font-size: 18px;
-    line-height: 1.6;
-}
-
-/* File section */
-.file-box {
+.file {
     margin-top: 20px;
-}
-
-/* Animation */
-@keyframes fadeIn {
-    from {opacity:0; transform: translateY(20px);}
-    to {opacity:1; transform: translateY(0);}
+    padding: 15px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 15px;
 }
 </style>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 </head>
 
 <body>
 
 <div class="container">
+    <h1>LEGION WEB</h1>
 
-    <h1>LEGION Q_WEB</h1>
+    <p>Welcome to Legion Web. Here you can access videos and files uploaded by the admin.</p>
 
-    <!-- INTRO TEXT -->
-    <h2>Welcome To Legion Web!</h2>
-
-    <p>
-        <b>Legion Web</b> is a free-to-use and learning website.<br><br>
-        
-        Here, you can find many <b>code lessons</b>, <b>notes</b>, and much more.<br><br>
-        
-        You can learn 
-        <span style="color:yellow;">Python</span>, 
-        <span style="color:cyan;">HTML</span>, 
-        <span style="color:lime;">CSS</span>, 
-        <span style="color:orange;">JavaScript</span>, 
-        <span style="color:pink;">Java</span>, 
-        <span style="color:lightblue;">Lua</span> and many more languages!<br><br>
-        
-        If you like our hard work, make sure to support us and stay connected 💙
-    </p>
-
-    <!-- FILE SECTION -->
     <h2>📂 Files</h2>
-    <div class="file-box" id="fileDisplay"></div>
-
+    <div id="fileDisplay"></div>
 </div>
 
 <script>
-// LOAD FILES (READ ONLY)
+// FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyAVwgEK8uQAcqvoTmU07PYYX0FmIHEbh9Q",
+  authDomain: "legion-web-816a0.firebaseapp.com",
+  projectId: "legion-web-816a0",
+  storageBucket: "legion-web-816a0.firebasestorage.app",
+  messagingSenderId: "939596002450",
+  appId: "1:939596002450:web:64da3ff4550553581f224b",
+  measurementId: "G-CKJTZ0EKMB"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// LOAD FILES FOR USERS
 window.onload = function() {
-    document.getElementById("fileDisplay").innerHTML = 
-        localStorage.getItem("files") || "No files uploaded yet.";
-}
+    let container = document.getElementById("fileDisplay");
+    container.innerHTML = "Loading...";
+
+    db.collection("files").get().then(snapshot => {
+        container.innerHTML = "";
+
+        if (snapshot.empty) {
+            container.innerHTML = "No files uploaded yet.";
+            return;
+        }
+
+        snapshot.forEach(doc => {
+            let data = doc.data();
+
+            let div = document.createElement("div");
+            div.className = "file";
+
+            div.innerHTML = `
+                <h3>${data.name}</h3>
+                <a href="${data.url}" target="_blank">Open File</a>
+            `;
+
+            container.appendChild(div);
+        });
+    });
+};
 </script>
 
 </body>
