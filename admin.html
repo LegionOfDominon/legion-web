@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel</title>
+
+<style>
+body {
+    font-family: sans-serif;
+    background: #111;
+    color: white;
+    text-align: center;
+}
+
+button {
+    padding: 10px;
+    margin: 5px;
+    background: red;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔐 Admin Panel</h1>
+
+<div id="login">
+    <input type="password" id="pass" placeholder="Enter Password">
+    <button onclick="login()">Login</button>
+</div>
+
+<div id="panel" style="display:none;">
+    <h2>Upload File</h2>
+    <input type="file" id="fileInput"><br>
+    <button onclick="uploadFile()">Upload</button>
+
+    <h2>Manage Files</h2>
+    <div id="fileDisplay"></div>
+</div>
+
+<script>
+
+const ADMIN_PASSWORD = "10009000XC"; // CHANGE THIS
+
+function login() {
+    let pass = document.getElementById("pass").value;
+    if(pass === ADMIN_PASSWORD) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("panel").style.display = "block";
+        loadFiles();
+    } else {
+        alert("Wrong password!");
+    }
+}
+
+function loadFiles() {
+    document.getElementById("fileDisplay").innerHTML = localStorage.getItem("files") || "";
+}
+
+function uploadFile() {
+    let file = document.getElementById("fileInput").files[0];
+    if(!file) return;
+
+    let url = URL.createObjectURL(file);
+
+    let fileHTML = `
+    <div>
+        ${file.type.startsWith("video") 
+            ? `<video controls width="300"><source src="${url}"></video>` 
+            : `<a href="${url}" download>${file.name}</a>`}
+        <br>
+        <button onclick="deleteFile(this)">Delete</button>
+    </div>`;
+
+    document.getElementById("fileDisplay").innerHTML += fileHTML;
+    saveFiles();
+}
+
+function deleteFile(btn) {
+    btn.parentElement.remove();
+    saveFiles();
+}
+
+function saveFiles() {
+    localStorage.setItem("files", document.getElementById("fileDisplay").innerHTML);
+}
+
+</script>
+
+</body>
+</html>

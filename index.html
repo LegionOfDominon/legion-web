@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legion Web</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #4df3e0, #6a9cff);
+    color: white;
+    text-align: center;
+}
+
+.container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 30px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>LEGION Q_WEB</h1>
+    <h2>📂 Files</h2>
+
+    <div id="fileDisplay"></div>
+</div>
+
+<script>
+// LOAD FILES (READ ONLY)
+window.onload = function() {
+    document.getElementById("fileDisplay").innerHTML = localStorage.getItem("files") || "No files uploaded yet.";
+}
+</script>
+
+</body>
+</html>
