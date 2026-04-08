@@ -7,88 +7,127 @@
 
 <style>
 body {
-    font-family: sans-serif;
+    font-family: Arial;
     background: #111;
     color: white;
     text-align: center;
 }
 
-button {
+.container {
+    margin-top: 50px;
+}
+
+input {
     padding: 10px;
-    margin: 5px;
-    background: red;
+    margin: 10px;
+    width: 250px;
+    border-radius: 10px;
     border: none;
-    color: white;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #00ffcc;
     cursor: pointer;
 }
+
+.file {
+    margin-top: 20px;
+    background: #222;
+    padding: 10px;
+    border-radius: 10px;
+}
 </style>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 </head>
 
 <body>
 
-<h1>🔐 Admin Panel</h1>
+<div class="container">
+    <h1>ADMIN PANEL</h1>
 
-<div id="login">
-    <input type="password" id="pass" placeholder="Enter Password">
-    <button onclick="login()">Login</button>
-</div>
+    <input type="text" id="fileName" placeholder="File Name">
+    <input type="text" id="fileURL" placeholder="Paste File Link">
+    <br>
+    <button onclick="addFile()">Add File</button>
 
-<div id="panel" style="display:none;">
-    <h2>Upload File</h2>
-    <input type="file" id="fileInput"><br>
-    <button onclick="uploadFile()">Upload</button>
-
-    <h2>Manage Files</h2>
-    <div id="fileDisplay"></div>
+    <h2>Uploaded Files</h2>
+    <div id="fileList"></div>
 </div>
 
 <script>
+// YOUR FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyAVwgEK8uQAcqvoTmU07PYYX0FmIHEbh9Q",
+  authDomain: "legion-web-816a0.firebaseapp.com",
+  projectId: "legion-web-816a0",
+  storageBucket: "legion-web-816a0.firebasestorage.app",
+  messagingSenderId: "939596002450",
+  appId: "1:939596002450:web:64da3ff4550553581f224b",
+  measurementId: "G-CKJTZ0EKMB"
+};
 
-const ADMIN_PASSWORD = "10009000XC"; // CHANGE THIS
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-function login() {
-    let pass = document.getElementById("pass").value;
-    if(pass === ADMIN_PASSWORD) {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("panel").style.display = "block";
-        loadFiles();
-    } else {
-        alert("Wrong password!");
+// ADD FILE
+function addFile() {
+    let name = document.getElementById("fileName").value;
+    let url = document.getElementById("fileURL").value;
+
+    if (!name || !url) {
+        alert("Fill all fields");
+        return;
     }
+
+    db.collection("files").add({
+        name: name,
+        url: url
+    }).then(() => {
+        alert("Added!");
+        loadFiles();
+    });
 }
 
+// LOAD FILES
 function loadFiles() {
-    document.getElementById("fileDisplay").innerHTML = localStorage.getItem("files") || "";
+    let container = document.getElementById("fileList");
+    container.innerHTML = "";
+
+    db.collection("files").get().then(snapshot => {
+        snapshot.forEach(doc => {
+            let data = doc.data();
+
+            let div = document.createElement("div");
+            div.className = "file";
+
+            div.innerHTML = `
+                <p>${data.name}</p>
+                <a href="${data.url}" target="_blank">Open</a>
+                <br><br>
+                <button onclick="deleteFile('${doc.id}')">Delete</button>
+            `;
+
+            container.appendChild(div);
+        });
+    });
 }
 
-function uploadFile() {
-    let file = document.getElementById("fileInput").files[0];
-    if(!file) return;
-
-    let url = URL.createObjectURL(file);
-
-    let fileHTML = `
-    <div>
-        ${file.type.startsWith("video") 
-            ? `<video controls width="300"><source src="${url}"></video>` 
-            : `<a href="${url}" download>${file.name}</a>`}
-        <br>
-        <button onclick="deleteFile(this)">Delete</button>
-    </div>`;
-
-    document.getElementById("fileDisplay").innerHTML += fileHTML;
-    saveFiles();
+// DELETE FILE
+function deleteFile(id) {
+    db.collection("files").doc(id).delete().then(() => {
+        loadFiles();
+    });
 }
 
-function deleteFile(btn) {
-    btn.parentElement.remove();
-    saveFiles();
-}
-
-function saveFiles() {
-    localStorage.setItem("files", document.getElementById("fileDisplay").innerHTML);
-}
-
+// LOAD ON START
+window.onload = loadFiles;
 </script>
 
 </body>
