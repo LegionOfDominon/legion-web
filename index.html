@@ -23,6 +23,24 @@ body {
     backdrop-filter: blur(10px);
 }
 
+/* FLEX FOR TEXT + LOGO */
+.typing-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+/* NEON TEXT */
+#typing-text {
+    font-size: 18px;
+    text-shadow: 
+        0 0 5px #00fff7,
+        0 0 10px #00fff7,
+        0 0 20px #00fff7,
+        0 0 40px #00fff7;
+}
+
 /* Cursor */
 #typing-text::after {
     content: "|";
@@ -32,6 +50,35 @@ body {
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
+}
+
+/* COMPUTER LOGO (CSS SHAPE) */
+.logo {
+    width: 40px;
+    height: 30px;
+    border: 3px solid #00fff7;
+    border-radius: 5px;
+    position: relative;
+    box-shadow: 0 0 10px #00fff7;
+    animation: spin 3s linear infinite;
+}
+
+/* Screen stand */
+.logo::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 10px;
+    width: 15px;
+    height: 5px;
+    background: #00fff7;
+    border-radius: 2px;
+}
+
+/* SPIN ANIMATION */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .file {
@@ -58,7 +105,10 @@ body {
 <div class="container">
     <h1>LEGION WEB</h1>
 
-    <p id="typing-text"></p>
+    <div class="typing-container">
+        <p id="typing-text"></p>
+        <div class="logo"></div>
+    </div>
 
     <p style="font-size: 0.85em; opacity: 0.8;">
     Disclaimer: This Website Has Resources Of Some Other Creators And Sources. All Credits Goes To Their Respective Owner!!!
@@ -83,7 +133,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// LOOP TYPING SYSTEM (FINAL FIX)
+// LOOP TYPING
 const text = "Welcome to Legion Web. Legion Web Is A Free To Use Online Website That Provides Many Code Lessons, Videos, Notes And ETC In One Place!";
 
 function startTypingLoop() {
@@ -99,7 +149,7 @@ function startTypingLoop() {
             setTimeout(() => {
                 el.textContent = "";
                 index = 0;
-                type(); // restart loop
+                type();
             }, 2000);
         }
     }
@@ -107,13 +157,11 @@ function startTypingLoop() {
     type();
 }
 
-// RUN AFTER PAGE LOAD
+// LOAD
 document.addEventListener("DOMContentLoaded", function() {
 
-    // START LOOP ANIMATION
     startTypingLoop();
 
-    // LOAD FILES
     let container = document.getElementById("fileDisplay");
     container.innerHTML = "Loading...";
 
