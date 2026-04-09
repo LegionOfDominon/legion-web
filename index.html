@@ -23,7 +23,7 @@ body {
     backdrop-filter: blur(10px);
 }
 
-/* Typing cursor */
+/* Cursor */
 #typing-text::after {
     content: "|";
     animation: blink 0.7s infinite;
@@ -83,33 +83,35 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// TYPING TEXT (LOOP VERSION)
+// LOOP TYPING SYSTEM (FINAL FIX)
 const text = "Welcome to Legion Web. Legion Web Is A Free To Use Online Website That Provides Many Code Lessons, Videos, Notes And ETC In One Place!";
-let index = 0;
 
-function typeWriter() {
+function startTypingLoop() {
     const el = document.getElementById("typing-text");
-    if (!el) return;
+    let index = 0;
 
-    if (index < text.length) {
-        el.textContent += text.charAt(index);
-        index++;
-        setTimeout(typeWriter, 40);
-    } else {
-        // WAIT 2 SEC → RESET → LOOP
-        setTimeout(() => {
-            el.textContent = "";
-            index = 0;
-            typeWriter();
-        }, 2000);
+    function type() {
+        if (index < text.length) {
+            el.textContent += text.charAt(index);
+            index++;
+            setTimeout(type, 40);
+        } else {
+            setTimeout(() => {
+                el.textContent = "";
+                index = 0;
+                type(); // restart loop
+            }, 2000);
+        }
     }
+
+    type();
 }
 
 // RUN AFTER PAGE LOAD
 document.addEventListener("DOMContentLoaded", function() {
 
     // START LOOP ANIMATION
-    typeWriter();
+    startTypingLoop();
 
     // LOAD FILES
     let container = document.getElementById("fileDisplay");
