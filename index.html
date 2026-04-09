@@ -83,26 +83,32 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// TYPING TEXT
+// TYPING TEXT (LOOP VERSION)
 const text = "Welcome to Legion Web. Legion Web Is A Free To Use Online Website That Provides Many Code Lessons, Videos, Notes And ETC In One Place!";
 let index = 0;
 
 function typeWriter() {
     const el = document.getElementById("typing-text");
-
     if (!el) return;
 
     if (index < text.length) {
         el.textContent += text.charAt(index);
         index++;
         setTimeout(typeWriter, 40);
+    } else {
+        // WAIT 2 SEC → RESET → LOOP
+        setTimeout(() => {
+            el.textContent = "";
+            index = 0;
+            typeWriter();
+        }, 2000);
     }
 }
 
 // RUN AFTER PAGE LOAD
 document.addEventListener("DOMContentLoaded", function() {
 
-    // START TYPING
+    // START LOOP ANIMATION
     typeWriter();
 
     // LOAD FILES
@@ -119,7 +125,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         snapshot.forEach(doc => {
             let data = doc.data();
-
             if (!data.name || !data.url) return;
 
             let div = document.createElement("div");
