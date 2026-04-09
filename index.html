@@ -23,7 +23,7 @@ body {
     backdrop-filter: blur(10px);
 }
 
-/* Typing effect cursor */
+/* Typing cursor */
 #typing-text::after {
     content: "|";
     animation: blink 0.7s infinite;
@@ -39,6 +39,11 @@ body {
     padding: 15px;
     background: rgba(0,0,0,0.2);
     border-radius: 15px;
+    transition: 0.3s;
+}
+
+.file:hover {
+    transform: scale(1.03);
 }
 </style>
 
@@ -53,11 +58,11 @@ body {
 <div class="container">
     <h1>LEGION WEB</h1>
 
-    <!-- Target ID for typing animation -->
     <p id="typing-text"></p>
 
     <p style="font-size: 0.85em; opacity: 0.8;">
-    Disclaimer: This Website Has Resources Of Some Other Creators And Sources. All Credits Goes To Their Respective Owner!!!</p>
+    Disclaimer: This Website Has Resources Of Some Other Creators And Sources. All Credits Goes To Their Respective Owner!!!
+    </p>
 
     <h2>📂 Files</h2>
     <div id="fileDisplay"></div>
@@ -78,22 +83,29 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// TYPING ANIMATION FUNCTION
+// TYPING TEXT
 const text = "Welcome to Legion Web. Legion Web Is A Free To Use Online Website That Provides Many Code Lessons, Videos, Notes And ETC In One Place!";
 let index = 0;
 
 function typeWriter() {
+    const el = document.getElementById("typing-text");
+
+    if (!el) return;
+
     if (index < text.length) {
-        document.getElementById("typing-text").innerHTML += text.charAt(index);
+        el.textContent += text.charAt(index);
         index++;
-        setTimeout(typeWriter, 40); // Adjust speed here (lower is faster)
+        setTimeout(typeWriter, 40);
     }
 }
 
-// LOAD DATA AND START ANIMATION
-window.onload = function() {
-    typeWriter(); // Start typing effect
+// RUN AFTER PAGE LOAD
+document.addEventListener("DOMContentLoaded", function() {
 
+    // START TYPING
+    typeWriter();
+
+    // LOAD FILES
     let container = document.getElementById("fileDisplay");
     container.innerHTML = "Loading...";
 
@@ -107,16 +119,26 @@ window.onload = function() {
 
         snapshot.forEach(doc => {
             let data = doc.data();
+
+            if (!data.name || !data.url) return;
+
             let div = document.createElement("div");
             div.className = "file";
+
             div.innerHTML = `
                 <h3>${data.name}</h3>
-                <a href="${data.url}" target="_blank" style="color: #fff; font-weight: bold;">Open File</a>
+                ${
+                    data.url.includes("mp4") 
+                    ? `<video width="100%" controls src="${data.url}"></video>` 
+                    : `<a href="${data.url}" target="_blank" style="color: #fff; font-weight: bold;">Open File</a>`
+                }
             `;
+
             container.appendChild(div);
         });
     });
-};
+
+});
 </script>
 
 </body>
